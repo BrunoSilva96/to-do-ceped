@@ -1,25 +1,15 @@
 import { StatusBar } from "expo-status-bar";
-import {
-	FlatList,
-	StyleSheet,
-	View,
-	Text,
-	TextInput,
-	TouchableOpacity,
-	Alert
-} from "react-native";
+import { FlatList, StyleSheet, View, Text, Alert } from "react-native";
 import { Task } from "./src/components/Task";
 import { CardNumber } from "./src/components/CardNumber";
-import { CardInOpen } from "./src/components/CardInOpen";
-import { CardDone } from "./src/components/CardDone";
 import { InputAddTask } from "./src/components/InputAddTask";
 import { useEffect, useState } from "react";
-import { Feather } from "@expo/vector-icons";
 
 export default function App() {
 	const [tasks, setTasks] = useState<{ description: string; check: boolean }[]>([]);
 	const [taskText, setTaskText] = useState("");
 	const [countTask, setCountTask] = useState(0);
+	const [countTasksDone, setCountTaskDone] = useState(0);
 
 	function handleTask() {
 		if (taskText == "") {
@@ -34,6 +24,32 @@ export default function App() {
 
 		setTasks([...tasks, newTask]);
 		setTaskText("");
+	}
+
+	function handleTaskChangeStatus(taskToChange: { description: string; check: boolean }) {
+		const updatedTasks = tasks.filter((task) => task !== taskToChange);
+		const newTask = {
+			description: taskToChange.description,
+			check: !taskToChange.check
+		};
+		updatedTasks.push(newTask);
+		setTasks(updatedTasks);
+	}
+
+	function handleTaskDelete(taskToDelete: { description: string; check: boolean }) {
+		Alert.alert("Atenção", `Deseja realmente remover a tarefa ${taskToDelete.description}?`, [
+			{
+				text: "Sim",
+				onPress: () => {
+					const updatedTasks = tasks.filter((task) => task !== taskToDelete);
+					setTasks(updatedTasks);
+				}
+			},
+			{
+				text: "Cancelar",
+				style: "cancel"
+			}
+		]);
 	}
 
 	useEffect(() => {
@@ -51,16 +67,23 @@ export default function App() {
 				value={taskText}></InputAddTask>
 
 			<View style={{ flexDirection: "row", gap: 16 }}>
-				<CardNumber />
-				<CardInOpen />
-				<CardDone />
+				<CardNumber title={"Cadastradas"} num={countTask} color={"#1e1e1e"} />
+				<CardNumber title={"Em aberto"} num={0} color={"#e88a1a"} />
+				<CardNumber title={"Finalizadas"} num={0} color={"#0e9577"} />
 			</View>
 
 			<Text>Tarefas: {countTask}</Text>
 			<FlatList
 				data={tasks}
 				keyExtractor={(item, index) => index.toString()}
-				renderItem={({ item }) => <Task />}
+				renderItem={({ item }) => (
+					<Task
+						title={item.description}
+						status={item.check}
+						onCheck={() => handleTaskChangeStatus(item)}
+						onRemove={() => handleTaskDelete(item)}
+					/>
+				)}
 				ListEmptyComponent={() => (
 					<View>
 						<Text>Você ainda não cadastrou tarefas.</Text>
