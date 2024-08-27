@@ -44,19 +44,11 @@ export default function App() {
 	return (
 		<View style={styles.container}>
 			<StatusBar style='auto' />
-			<View style={styles.inputContainer}>
-				<TextInput
-					style={styles.input}
-					placeholder='Digite aqui sua tarefa.'
-					placeholderTextColor='white'
-					keyboardType='default'
-					onChangeText={setTaskText}
-					value={taskText}
-				/>
-				<TouchableOpacity style={styles.inputButton} onPress={handleTask}>
-					<Feather name='plus-square' size={24} color='white' />
-				</TouchableOpacity>
-			</View>
+
+			<InputAddTask
+				onPress={handleTask}
+				onChangeText={setTaskText}
+				value={taskText}></InputAddTask>
 
 			<View style={{ flexDirection: "row", gap: 16 }}>
 				<CardNumber />
@@ -64,20 +56,18 @@ export default function App() {
 				<CardDone />
 			</View>
 
-			<View style={styles.tasks}>
-				<Text>Tarefas: {countTask}</Text>
-				<FlatList
-					data={tasks}
-					keyExtractor={(item, index) => index.toString()}
-					renderItem={({ item }) => <Task />}
-					ListEmptyComponent={() => (
-						<View>
-							<Text>Você ainda não cadastrou tarefas.</Text>
-							<Text>Crie uma tarefa para começar!</Text>
-						</View>
-					)}
-				/>
-			</View>
+			<Text>Tarefas: {countTask}</Text>
+			<FlatList
+				data={tasks}
+				keyExtractor={(item, index) => index.toString()}
+				renderItem={({ item }) => <Task />}
+				ListEmptyComponent={() => (
+					<View>
+						<Text>Você ainda não cadastrou tarefas.</Text>
+						<Text>Crie uma tarefa para começar!</Text>
+					</View>
+				)}
+			/>
 		</View>
 	);
 }
@@ -91,27 +81,5 @@ const styles = StyleSheet.create({
 		padding: 16,
 		paddingTop: 64,
 		gap: 16
-	},
-	inputContainer: {
-		flexDirection: "row",
-		borderRadius: 4,
-		backgroundColor: "#252627"
-	},
-	input: {
-		backgroundColor: "#252627",
-		flex: 1,
-		padding: 16,
-		borderRadius: 4,
-		color: "#fff"
-	},
-	inputButton: {
-		backgroundColor: "#1e1e1e",
-		padding: 16,
-		borderRadius: 4
-	},
-	tasks: {
-		justifyContent: "flex-start",
-		width: "100%",
-		flexDirection: "column"
 	}
 });
