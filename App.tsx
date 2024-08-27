@@ -10,6 +10,7 @@ export default function App() {
 	const [taskText, setTaskText] = useState("");
 	const [countTask, setCountTask] = useState(0);
 	const [countTasksDone, setCountTaskDone] = useState(0);
+	const [countTasksOpen, setCountTaskOpen] = useState(0);
 
 	function handleTask() {
 		if (taskText == "") {
@@ -54,7 +55,18 @@ export default function App() {
 
 	useEffect(() => {
 		let totalTasks = tasks.length;
+
 		setCountTask(totalTasks);
+	}, [tasks]);
+
+	useEffect(() => {
+		let totalTasksDone = tasks.filter((task) => task.check === true).length;
+		setCountTaskDone(totalTasksDone);
+	}, [tasks]);
+
+	useEffect(() => {
+		let totalTasksOpen = tasks.filter((task) => task.check === false).length;
+		setCountTaskOpen(totalTasksOpen);
 	}, [tasks]);
 
 	return (
@@ -68,8 +80,8 @@ export default function App() {
 
 			<View style={{ flexDirection: "row", gap: 16 }}>
 				<CardNumber title={"Cadastradas"} num={countTask} color={"#1e1e1e"} />
-				<CardNumber title={"Em aberto"} num={0} color={"#e88a1a"} />
-				<CardNumber title={"Finalizadas"} num={0} color={"#0e9577"} />
+				<CardNumber title={"Em aberto"} num={countTasksOpen} color={"#e88a1a"} />
+				<CardNumber title={"Finalizadas"} num={countTasksDone} color={"#0e9577"} />
 			</View>
 
 			<Text>Tarefas: {countTask}</Text>
