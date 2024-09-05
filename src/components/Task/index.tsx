@@ -1,16 +1,23 @@
 import { Feather } from "@expo/vector-icons";
 import { Container, TaskText, TaskDone, TaskDelete } from "./styles";
 
-type Props = {
-	title: string;
-	status: boolean;
-	onCheck?: () => void;
-	onRemove?: () => void;
-};
+import { TaskProps, RootStackParamList } from "../../utils/types";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { useState } from "react";
+import { useNavigation } from "@react-navigation/native";
 
-export function Task({ title, status, onCheck, onRemove }: Props) {
+type Props = NativeStackScreenProps<RootStackParamList>;
+
+export function Task({ id, title, status, onCheck, onRemove }: TaskProps) {
+	const [task, setTask] = useState<TaskProps>({ id, title, status, onCheck, onRemove });
+	const navigation = useNavigation<Props["navigation"]>();
+
+	function handlePress() {
+		navigation.navigate("Details", { id, title, status });
+	}
+
 	return (
-		<Container>
+		<Container onPress={() => handlePress()}>
 			<TaskDone onPress={onCheck} style={status ? { backgroundColor: "#0E9577" } : {}}>
 				{!status && <Feather name='square' size={24} color='white' />}
 				{status && <Feather name='check-square' size={24} color='white' />}
