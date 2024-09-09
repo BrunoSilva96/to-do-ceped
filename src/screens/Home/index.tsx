@@ -2,10 +2,13 @@ import { FlatList, StyleSheet, View, Text, Alert } from "react-native";
 import { Task } from "../../components/Task";
 import { CardNumber } from "../../components/CardNumber";
 import { InputAddTask } from "../../components/InputAddTask";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import { TaskContext } from "../../context/TaskContext";
+import { TaskProps } from "../../utils/types";
 
 export default function Home() {
-	const [tasks, setTasks] = useState<{ description: string; check: boolean }[]>([]);
+	const { tasks, createTask, setTasks } = useContext(TaskContext);
+
 	const [taskText, setTaskText] = useState("");
 	const [countTask, setCountTask] = useState(0);
 	const [countTasksDone, setCountTaskDone] = useState(0);
@@ -16,28 +19,27 @@ export default function Home() {
 			return Alert.alert("Erro", "Tarefa está sem descrição.");
 		}
 
-		if (tasks.some((task) => task.description === taskText)) {
+		if (tasks.some((task) => task.title === taskText)) {
 			return Alert.alert("Erro", "Tarefa já existe.");
 		}
 
-		const newTask = { description: taskText, check: false };
-
-		setTasks([...tasks, newTask]);
+		createTask(taskText);
 		setTaskText("");
 	}
 
-	function handleTaskChangeStatus(taskToChange: { description: string; check: boolean }) {
-		const updatedTasks = tasks.filter((task) => task !== taskToChange);
+	function handleTaskChangeStatus(taskToChange: TaskProps) {
+		const updatedTasks = tasks.filter((task) => task.title !== taskToChange.title);
 		const newTask = {
-			description: taskToChange.description,
-			check: !taskToChange.check
+			id: taskToChange.id,
+			title: taskToChange.title,
+			status: !taskToChange.status
 		};
 		updatedTasks.push(newTask);
 		setTasks(updatedTasks);
 	}
 
-	function handleTaskDelete(taskToDelete: { description: string; check: boolean }) {
-		Alert.alert("Atenção", `Deseja realmente remover a tarefa ${taskToDelete.description}?`, [
+	function handleTaskDelete(taskToDelete: TaskProps) {
+		Alert.alert("Atenção", `Deseja realmente remover a tarefa ${taskToDelete.title}?`, [
 			{
 				text: "Sim",
 				onPress: () => {
@@ -59,12 +61,12 @@ export default function Home() {
 	}, [tasks]);
 
 	useEffect(() => {
-		let totalTasksDone = tasks.filter((task) => task.check === true).length;
+		let totalTasksDone = tasks.filter((task) => task.status === true).length;
 		setCountTaskDone(totalTasksDone);
 	}, [tasks]);
 
 	useEffect(() => {
-		let totalTasksOpen = tasks.filter((task) => task.check === false).length;
+		let totalTasksOpen = tasks.filter((task) => task.status === false).length;
 		setCountTaskOpen(totalTasksOpen);
 	}, [tasks]);
 
@@ -87,11 +89,11 @@ export default function Home() {
 				keyExtractor={(item, index) => index.toString()}
 				renderItem={({ item }) => (
 					<Task
-						title={item.description}
-						status={item.check}
+						id={item.id}
+						title={item.title}
+						status={item.status}
 						onCheck={() => handleTaskChangeStatus(item)}
 						onRemove={() => handleTaskDelete(item)}
-						id={0}
 					/>
 				)}
 				ListEmptyComponent={() => (
