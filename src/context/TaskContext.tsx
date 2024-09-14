@@ -40,7 +40,7 @@ function TaskProvider({ children }: TaskProviderProps) {
 		try {
 			const tasks = await AsyncStorage.getItem("@tasks");
 			if (tasks) {
-				setTask(JSON.parse(tasks));
+				setTasks(JSON.parse(tasks));
 			}
 		} catch (error) {
 			console.log(error);
